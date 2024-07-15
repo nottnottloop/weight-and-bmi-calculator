@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight and BMI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .height-group {
+            display: flex;
+            gap: 10px;
+        }
+        .theme-toggle {
+            background: none;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .light-theme {
+            background-color: #ffffff;
+            color: #121212;
+        }
+        .light-theme .container {
+            background-color: #f0f0f0;
+            color: #121212;
+        }
+        .light-theme input {
+            background-color: #ffffff;
+            color: #121212;
+            border: 1px solid #ccc;
+        }
+        .light-theme .theme-toggle {
+            border: 1px solid #121212;
+            color: #121212;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="theme-toggle" id="theme-toggle">Toggle Light Theme</button>
+    <div class="input-group height-group">
+        <div>
+            <label for="height-cm">Height (cm):</label>
+            <input type="number" id="height-cm" step="0.1">
+        </div>
+        <div>
+            <label for="height-feet">Height (feet):</label>
+            <input type="number" id="height-feet" step="1">
+        </div>
+        <div>
+            <label for="height-inches">Height (inches):</label>
+            <input type="number" id="height-inches" step="0.1">
+        </div>
+    </div>
+    <div class="input-group">
+        <label for="weight-lbs">Weight (lbs):</label>
+        <input type="number" id="weight-lbs" step="0.1">
+    </div>
+    <div class="input-group">
+        <label for="weight-kg">Weight (kg):</label>
+        <input type="number" id="weight-kg" step="0.1">
+    </div>
+    <div class="input-group">
+        <label for="bmi">BMI:</label>
+        <input type="number" id="bmi" step="0.1">
+    </div>
+</div>
+
+<script>
+    const heightCmInput = document.getElementById('height-cm');
+    const heightFeetInput = document.getElementById('height-feet');
+    const heightInchesInput = document.getElementById('height-inches');
+    const weightLbsInput = document.getElementById('weight-lbs');
+    const weightKgInput = document.getElementById('weight-kg');
+    const bmiInput = document.getElementById('bmi');
+    const themeToggleBtn = document.getElementById('theme-toggle');
+
+    heightCmInput.addEventListener('input', updateFromHeightCm);
+    heightFeetInput.addEventListener('input', updateFromHeightFeetInches);
+    heightInchesInput.addEventListener('input', updateFromHeightFeetInches);
+    weightLbsInput.addEventListener('input', updateFromLbs);
+    weightKgInput.addEventListener('input', updateFromKg);
+    bmiInput.addEventListener('input', updateFromBmi);
+    themeToggleBtn.addEventListener('click', toggleTheme);
+
+    function updateFromHeightCm() {
+        const heightCm = parseFloat(heightCmInput.value);
+        if (!isNaN(heightCm)) {
+            const heightM = heightCm / 100;
+            const heightInchesTotal = heightCm / 2.54;
+            const heightFeet = Math.floor(heightInchesTotal / 12);
+            const heightInches = heightInchesTotal % 12;
+            heightFeetInput.value = heightFeet;
+            heightInchesInput.value = heightInches.toFixed(1);
+            const bmi = parseFloat(bmiInput.value);
+            if (!isNaN(bmi)) {
+                const weightKg = bmi * heightM * heightM;
+                weightKgInput.value = weightKg.toFixed(1);
+                weightLbsInput.value = (weightKg / 0.45359237).toFixed(1);
+            }
+        }
+    }
+
+    function updateFromHeightFeetInches() {
+        const heightFeet = parseFloat(heightFeetInput.value);
+        const heightInches = parseFloat(heightInchesInput.value);
+        if (!isNaN(heightFeet) && !isNaN(heightInches)) {
+            const heightInchesTotal = (heightFeet * 12) + heightInches;
+            const heightCm = heightInchesTotal * 2.54;
+            heightCmInput.value = heightCm.toFixed(1);
+            const heightM = heightCm / 100;
+            const bmi = parseFloat(bmiInput.value);
+            if (!isNaN(bmi)) {
+                const weightKg = bmi * heightM * heightM;
+                weightKgInput.value = weightKg.toFixed(1);
+                weightLbsInput.value = (weightKg / 0.45359237).toFixed(1);
+            }
+        }
+    }
+
+    function updateFromLbs() {
+        const lbs = parseFloat(weightLbsInput.value);
+        const heightCm = parseFloat(heightCmInput.value);
+        if (!isNaN(lbs) && !isNaN(heightCm)) {
+            const kg = lbs * 0.45359237;
+            weightKgInput.value = kg.toFixed(1);
+            const heightM = heightCm / 100;
+            const bmi = kg / (heightM * heightM);
+            bmiInput.value = bmi.toFixed(1);
+        }
+    }
+
+    function updateFromKg() {
+        const kg = parseFloat(weightKgInput.value);
+        const heightCm = parseFloat(heightCmInput.value);
+        if (!isNaN(kg) && !isNaN(heightCm)) {
+            const lbs = kg / 0.45359237;
+            weightLbsInput.value = lbs.toFixed(1);
+            const heightM = heightCm / 100;
+            const bmi = kg / (heightM * heightM);
+            bmiInput.value = bmi.toFixed(1);
+        }
+    }
+
+    function updateFromBmi() {
+        const bmi = parseFloat(bmiInput.value);
+        const heightCm = parseFloat(heightCmInput.value);
+        if (!isNaN(bmi) && !isNaN(heightCm)) {
+            const heightM = heightCm / 100;
+            const kg = bmi * heightM * heightM;
+            weightKgInput.value = kg.toFixed(1);
+            weightLbsInput.value = (kg / 0.45359237).toFixed(1);
+        }
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        themeToggleBtn.textContent = isLight ? 'Toggle Dark Theme' : 'Toggle Light Theme';
+    }
+</script>
+
+</body>
+</html>
